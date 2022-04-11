@@ -2,7 +2,7 @@ const { access, readFile, writeFile } = require("fs/promises");
 const axios = require("axios");
 const { createWriteStream } = require("fs");
 
-const csvPath = "input.csv";
+const csvPath = process.argv[3] ?? "input.csv";
 const key = process.argv[2];
 
 async function run() {
@@ -26,7 +26,7 @@ async function run() {
     console.log("Berechne", lines.length, "Ziele ...")
 
     const output = createWriteStream("output.csv");
-    output.write("Start,Ziel,Status,Zeit\n")
+    output.write("Start,Ziel,Status,Zeit_Formatiert,Sekunden\n")
 
     for (const [origin, destination] of lines) {
         const { data } = await axios.get("https://maps.googleapis.com/maps/api/directions/json", {
@@ -35,11 +35,11 @@ async function run() {
             }
         });
 
-        const duration = data.routes[0]?.legs[0].duration.text;
+        const duration = data.routes[0]?.legs[0].duration;
 
-        console.log("\n", origin, "  ---", duration, "--->   ", destination);
+        console.log("\n", origin, "  ---", duration.text, "--->   ", destination);
 
-        output.write([origin, destination, data.status, duration].join(",") + "\n")
+        output.write([origin, destination, data.status, duration.text, duration.value].join(",") + "\n")
     }
     console.log("fertig");
 }
