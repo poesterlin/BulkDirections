@@ -1,6 +1,7 @@
 const { access, readFile, writeFile } = require("fs/promises");
 const axios = require("axios");
 const { createWriteStream } = require("fs");
+const { setTimeout } = require("timers");
 
 const csvPath = process.argv[3] ?? "input.csv";
 const key = process.argv[2];
@@ -40,6 +41,7 @@ async function run() {
         console.log("\n", origin, "  ---", duration.text, "--->   ", destination);
 
         output.write([origin, destination, data.status, duration.text, duration.value].join(",") + "\n")
+        await setTimeout(1000 / 25);
     }
     console.log("fertig");
 }
